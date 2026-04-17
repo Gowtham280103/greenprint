@@ -2,7 +2,7 @@
    EcoTrack AI — Modern Dashboard JS
    ═══════════════════════════════════════════════════════════ */
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = window.location.hostname === "localhost" ? "http://localhost:5000/api" : "/api";
 const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"; // Replace with your key
 const GLOBAL_AVG = 13.0;
 
@@ -611,3 +611,4 @@ function showToast(msg, isError = false) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove("show"), 3500);
 }
+

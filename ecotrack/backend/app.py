@@ -1,12 +1,16 @@
 ﻿from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-import json
 import os
 from datetime import datetime
 from calculator import calculate_footprint, generate_suggestions, compute_eco_score
 from storage import save_entry, get_history, get_weekly_summary
 
-FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
+# When running in Docker the frontend sits at /app/frontend
+# When running locally it sits at ../frontend relative to backend/
+_here = os.path.dirname(__file__)
+FRONTEND_DIR = os.path.join(_here, "..", "frontend")
+if not os.path.isdir(FRONTEND_DIR):
+    FRONTEND_DIR = os.path.join(_here, "..", "..", "frontend")
 
 app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
 CORS(app)
@@ -63,4 +67,5 @@ def static_files(filename):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
