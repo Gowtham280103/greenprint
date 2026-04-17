@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoTrack AI — Carbon Footprint Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════ SIDEBAR NAV ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🌿</div>
+    <div class="logo-text-wrap">
+      <span class="logo-name">EcoTrack</span>
+      <span class="logo-ai">AI</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <button class="nav-item active" data-view="tracker">
+      <span class="nav-icon">🎯</span>
+      <span class="nav-label">Tracker</span>
+    </button>
+    <button class="nav-item" data-view="dashboard">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-item" data-view="history">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">History</span>
+    </button>
+    <button class="nav-item" data-view="challenges">
+      <span class="nav-icon">🏆</span>
+      <span class="nav-label">Challenges</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">
+      <span class="theme-icon">🌙</span>
+      <span class="theme-label">Dark Mode</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════════════ MOBILE TOPBAR ══ -->
+<header class="topbar">
+  <button class="menu-btn" id="menu-btn" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="topbar-logo">🌿 EcoTrack <span class="logo-ai">AI</span></div>
+  <button class="theme-toggle-mobile" id="theme-toggle-mobile">🌙</button>
+</header>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- ══════════════════════════════════════ MAIN CONTENT ══ -->
+<div class="main-wrap">
+
+  <!-- ════════════════════ TRACKER VIEW ════════════════════ -->
+  <section id="view-tracker" class="view active">
+    <div class="view-header">
+      <div>
+        <h1 class="view-title">Daily Tracker</h1>
+        <p class="view-subtitle">Log your habits and get instant AI-powered insights</p>
+      </div>
+      <div class="view-date" id="view-date"></div>
+    </div>
+
+    <div class="tracker-grid">
+
+      <!-- INPUT FORM -->
+      <div class="form-card glass-card">
+        <div class="form-card-header">
+          <h2>📋 Today's Inputs</h2>
+          <span class="form-step-badge">Step 1 of 1</span>
+        </div>
+
+        <form id="eco-form">
+
+          <!-- Travel -->
+          <div class="input-group">
+            <div class="input-group-header">
+              <span class="input-group-icon travel-icon">🚗</span>
+              <span class="input-group-title">Travel</span>
+            </div>
+            <div class="input-row">
+              <div class="input-field">
+                <label for="travel_km">Distance (km)</label>
+                <input type="number" id="travel_km" name="travel_km"
+                       min="0" max="2000" step="0.1" value="20" required />
+              </div>
+              <div class="input-field">
+                <label for="vehicle_type">Vehicle</label>
+                <select id="vehicle_type" name="vehicle_type">
+                  <option value="car_petrol">🚗 Petrol Car</option>
+                  <option value="car_diesel">🚗 Diesel Car</option>
+                  <option value="car_electric">⚡ Electric Car</option>
+                  <option value="motorcycle">🏍️ Motorcycle</option>
+                  <option value="bus">🚌 Bus</option>
+                  <option value="train">🚆 Train</option>
+                  <option value="bicycle">🚲 Bicycle</option>
+                  <option value="walking">🚶 Walking</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Electricity -->
+          <div class="input-group">
+            <div class="input-group-header">
+              <span class="input-group-icon elec-icon">💡</span>
+              <span class="input-group-title">Electricity</span>
+            </div>
+            <div class="input-row">
+              <div class="input-field full-width">
+                <label for="electricity_kwh">Monthly usage (kWh)
+                  <span class="label-hint">avg home: 200–400</span>
+                </label>
+                <input type="number" id="electricity_kwh" name="electricity_kwh"
+                       min="0" max="5000" step="1" value="250" required />
+                <div class="range-track">
+                  <input type="range" id="electricity_range" min="0" max="1000" step="10" value="250" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Food -->
+          <div class="input-group">
+            <div class="input-group-header">
+              <span class="input-group-icon food-icon">🥗</span>
+              <span class="input-group-title">Food</span>
+            </div>
+            <div class="diet-options" id="diet-options">
+              <label class="diet-option">
+                <input type="radio" name="diet_type" value="vegan" />
+                <span class="diet-card"><span class="diet-emoji">🌱</span><span>Vegan</span></span>
+              </label>
+              <label class="diet-option">
+                <input type="radio" name="diet_type" value="vegetarian" />
+                <span class="diet-card"><span class="diet-emoji">🥦</span><span>Vegetarian</span></span>
+              </label>
+              <label class="diet-option">
+                <input type="radio" name="diet_type" value="pescatarian" />
+                <span class="diet-card"><span class="diet-emoji">🐟</span><span>Pescatarian</span></span>
+              </label>
+              <label class="diet-option">
+                <input type="radio" name="diet_type" value="omnivore" checked />
+                <span class="diet-card"><span class="diet-emoji">🍽️</span><span>Omnivore</span></span>
+              </label>
+              <label class="diet-option">
+                <input type="radio" name="diet_type" value="heavy_meat" />
+                <span class="diet-card"><span class="diet-emoji">🥩</span><span>Heavy Meat</span></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Shopping -->
+          <div class="input-group">
+            <div class="input-group-header">
+              <span class="input-group-icon shop-icon">🛍️</span>
+              <span class="input-group-title">Shopping</span>
+            </div>
+            <div class="shopping-options">
+              <label class="shop-option">
+                <input type="radio" name="shopping_habit" value="minimal" />
+                <span class="shop-card">
+                  <span class="shop-level">Minimal</span>
+                  <span class="shop-desc">Essentials only</span>
+                </span>
+              </label>
+              <label class="shop-option">
+                <input type="radio" name="shopping_habit" value="moderate" checked />
+                <span class="shop-card">
+                  <span class="shop-level">Moderate</span>
+                  <span class="shop-desc">Occasional extras</span>
+                </span>
+              </label>
+              <label class="shop-option">
+                <input type="radio" name="shopping_habit" value="frequent" />
+                <span class="shop-card">
+                  <span class="shop-level">Frequent</span>
+                  <span class="shop-desc">Regular non-essentials</span>
+                </span>
+              </label>
+              <label class="shop-option">
+                <input type="radio" name="shopping_habit" value="excessive" />
+                <span class="shop-card">
+                  <span class="shop-level">Excessive</span>
+                  <span class="shop-desc">Heavy consumer</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-calculate" id="calc-btn">
+            <span class="btn-calculate-inner">
+              <span>🌍</span>
+              <span>Calculate My Footprint</span>
+            </span>
+          </button>
+        </form>
+      </div>
+
+      <!-- RESULTS PANEL -->
+      <div class="results-col" id="results-panel" hidden>
+
+        <!-- Hero score -->
+        <div class="score-hero glass-card">
+          <div class="score-hero-left">
+            <div class="score-label">Daily CO₂</div>
+            <div class="score-value" id="score-total">—</div>
+            <div class="score-unit">kg CO₂ / day</div>
+            <div class="impact-badge" id="impact-badge">—</div>
+          </div>
+          <div class="score-hero-right">
+            <div class="eco-score-wrap">
+              <svg class="eco-ring" viewBox="0 0 120 120">
+                <circle class="eco-ring-bg" cx="60" cy="60" r="50"/>
+                <circle class="eco-ring-fill" id="eco-ring-fill" cx="60" cy="60" r="50"
+                        stroke-dasharray="314" stroke-dashoffset="314"/>
+              </svg>
+              <div class="eco-score-center">
+                <div class="eco-score-num" id="eco-score-num">—</div>
+                <div class="eco-score-lbl">Eco Score</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stat cards row -->
+        <div class="stat-cards" id="stat-cards">
+          <div class="stat-card travel-stat">
+            <div class="stat-icon">🚗</div>
+            <div class="stat-body">
+              <div class="stat-val" id="stat-travel">—</div>
+              <div class="stat-lbl">Travel</div>
+            </div>
+          </div>
+          <div class="stat-card elec-stat">
+            <div class="stat-icon">💡</div>
+            <div class="stat-body">
+              <div class="stat-val" id="stat-elec">—</div>
+              <div class="stat-lbl">Electricity</div>
+            </div>
+          </div>
+          <div class="stat-card food-stat">
+            <div class="stat-icon">🥗</div>
+            <div class="stat-body">
+              <div class="stat-val" id="stat-food">—</div>
+              <div class="stat-lbl">Food</div>
+            </div>
+          </div>
+          <div class="stat-card shop-stat">
+            <div class="stat-icon">🛍️</div>
+            <div class="stat-body">
+              <div class="stat-val" id="stat-shop">—</div>
+              <div class="stat-lbl">Shopping</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CO2 equivalents -->
+        <div class="equivalents-card glass-card" id="equivalents-card">
+          <h3 class="card-heading">🌳 CO₂ Equivalents</h3>
+          <div class="equiv-grid" id="equiv-grid"></div>
+        </div>
+
+        <!-- Breakdown chart -->
+        <div class="chart-glass-card glass-card">
+          <h3 class="card-heading">🔍 Category Breakdown</h3>
+          <div class="chart-container">
+            <canvas id="breakdown-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- AI Suggestions -->
+        <div class="ai-card glass-card">
+          <div class="ai-card-header">
+            <div class="ai-header-left">
+              <div class="ai-pulse"></div>
+              <h3 class="card-heading" style="margin:0">🤖 AI Suggestions</h3>
+            </div>
+            <span class="gemini-badge">✨ Gemini AI</span>
+          </div>
+          <div id="ai-loading" class="ai-loading" hidden>
+            <div class="ai-dots"><span></span><span></span><span></span></div>
+            <span>Generating personalised insights…</span>
+          </div>
+          <div id="ai-insights" class="ai-insights"></div>
+          <ul class="suggestions-list" id="suggestions-list"></ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════ DASHBOARD VIEW ══════════════════ -->
+  <section id="view-dashboard" class="view">
+    <div class="view-header">
+      <div>
+        <h1 class="view-title">Dashboard</h1>
+        <p class="view-subtitle">Your carbon footprint at a glance</p>
+      </div>
+    </div>
+
+    <div class="dashboard-stats" id="dash-stats">
+      <div class="dash-stat-card glass-card">
+        <div class="dash-stat-icon">📅</div>
+        <div class="dash-stat-body">
+          <div class="dash-stat-val" id="dash-today">—</div>
+          <div class="dash-stat-lbl">Today (kg CO₂)</div>
+        </div>
+      </div>
+      <div class="dash-stat-card glass-card">
+        <div class="dash-stat-icon">📈</div>
+        <div class="dash-stat-body">
+          <div class="dash-stat-val" id="dash-avg">—</div>
+          <div class="dash-stat-lbl">7-Day Average</div>
+        </div>
+      </div>
+      <div class="dash-stat-card glass-card">
+        <div class="dash-stat-icon">🌳</div>
+        <div class="dash-stat-body">
+          <div class="dash-stat-val" id="dash-trees">—</div>
+          <div class="dash-stat-lbl">Trees to Offset/Year</div>
+        </div>
+      </div>
+      <div class="dash-stat-card glass-card">
+        <div class="dash-stat-icon">🏅</div>
+        <div class="dash-stat-body">
+          <div class="dash-stat-val" id="dash-streak">—</div>
+          <div class="dash-stat-lbl">Day Streak</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-charts">
+      <div class="glass-card dash-chart-card">
+        <h3 class="card-heading">📉 7-Day Trend</h3>
+        <div class="chart-container chart-tall">
+          <canvas id="trend-chart"></canvas>
+        </div>
+      </div>
+      <div class="glass-card dash-chart-card">
+        <h3 class="card-heading">🥧 Average Breakdown</h3>
+        <div class="chart-container">
+          <canvas id="avg-breakdown-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="glass-card badges-card">
+      <h3 class="card-heading">🏆 Your Badges</h3>
+      <div class="badges-grid" id="badges-grid">
+        <div class="empty-state">Calculate your footprint to earn badges!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════ HISTORY VIEW ════════════════════ -->
+  <section id="view-history" class="view">
+    <div class="view-header">
+      <div>
+        <h1 class="view-title">History</h1>
+        <p class="view-subtitle">All your tracked entries</p>
+      </div>
+    </div>
+
+    <div class="glass-card history-card">
+      <div class="history-toolbar">
+        <h3 class="card-heading" style="margin:0">📋 Entry Log</h3>
+        <span class="entry-count" id="entry-count">0 entries</span>
+      </div>
+      <div id="history-table-wrap">
+        <p class="empty-state">No entries yet. Start tracking!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════ CHALLENGES VIEW ════════════════ -->
+  <section id="view-challenges" class="view">
+    <div class="view-header">
+      <div>
+        <h1 class="view-title">Daily Challenges</h1>
+        <p class="view-subtitle">Small actions, big impact</p>
+      </div>
+    </div>
+    <div class="challenges-grid" id="challenges-grid"></div>
+  </section>
+
+</div><!-- /main-wrap -->
+
+<!-- ══════════════════════════════════════ TOAST ══ -->
+<div id="toast" class="toast" aria-live="polite"></div>
+
+<!-- ══════════════════════════════════════ PAGE LOADER ══ -->
+<div class="page-loader" id="page-loader">
+  <div class="loader-logo">🌿</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
